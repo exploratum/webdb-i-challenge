@@ -66,7 +66,6 @@ server.put('/accounts', async (req,res) => {
         foundAccount = await accountsDb.findById(id);
         if(!foundAccount) {
             res.status(400).json({"errormessage": "id for account does not exist"});
-            return;
         }
     
     }

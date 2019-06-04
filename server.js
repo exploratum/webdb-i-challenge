@@ -51,12 +51,32 @@ server.post ('/accounts', validateAccountInfo, async (req,res) => {
 /*        Update an existing account           */
 /**********************************************/
 
-server.put('/accounts/:id', validateIdAndSaveAccount, validateAccountInfo, async (req,res) => {
-    const body = req.body;
-    const id = req.params.id;
+server.put('/accounts', async (req,res) => {
+    const account = req.body.account;
+    const id = req.body.id;
+    console.log("id:", id);
 
+    //Check if name and budget are provided
+    if (!account.name || ! account.budget) {
+        res.status(400).json({"message": "name and budget are required"})
+        return;
+    }
+    //check if id exists
     try {
-        const count = await accountsDb.update(id, body);
+        foundAccount = await accountsDb.findById(id);
+        if(!foundAccount) {
+            res.status(400).json({"errormessage": "id for account does not exist"});
+            return;
+        }
+    
+    }
+    catch {
+        res.status(500).json({"errorMessage": "Could not check if id exists"});
+    }
+
+    //update database
+    try {
+        const count = await accountsDb.update(id, account);
         res.status(200).json({"message": `${count} message(s) updated`});
     }
     catch {
